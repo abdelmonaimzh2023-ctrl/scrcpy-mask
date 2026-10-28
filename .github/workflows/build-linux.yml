@@ -85,3 +85,11 @@ jobs:
         run: |
           . ./scripts/ffmpeg-env.sh
           cargo build --release
+
+      # --- هذا هو الجزء الذي أضفناه لرفع الملف ---
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrcpy-mask-linux
+          path: target/release/scrcpy-mask
+      # ------------------------------------------
