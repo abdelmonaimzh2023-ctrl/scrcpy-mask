@@ -1,45 +1,16 @@
-name: Build Scrcpy Mask for Linux
-
-on:
-  workflow_dispatch: # يسمح لك بتشغيل البناء يدوياً من واجهة GitHub
-
-jobs:
-  build:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Linux build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf
-
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
-      - name: Install frontend dependencies
-        run: pnpm install
+      - name: Install just
+        run: cargo install just
 
-      - name: Build FFmpeg (using the project's script)
-        run: |
-          # هذا الأمر يقوم بتشغيل سكريبت بناء FFmpeg الموجود في المشروع
-          chmod +x build-ffmpeg.sh
-          ./build-ffmpeg.sh
+      - name: Setup project (install frontend deps & build FFmpeg)
+        run: just setup
+
+      - name: Build frontend
+        run: just web-build
 
       - name: Build the application
-        run: |
-          # هنا نقوم ببناء المشروع باستخدام Cargo
-          cargo build --release
-
-      - name: Upload AppImage Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: scrcpy-mask-linux-appimage
-          # المسار النهائي لملف AppImage بعد البناء
-          path: target/release/bundle/appimage/*.AppImage
+        run: cargo build --release
