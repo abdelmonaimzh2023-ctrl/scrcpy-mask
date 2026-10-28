@@ -1,10 +1,68 @@
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
+name: Build Linux
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build Linux
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    env:
+      CARGO_TERM_COLOR: always
+      RUST_BACKTRACE: 1
+      FFMPEG_VERSION: "7.1.2"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential \
+            curl \
+            ca-certificates \
+            git \
+            pkg-config \
+            nasm \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libasound2-dev \
+            libudev-dev \
+            libgl1-mesa-dev \
+            libwayland-dev \
+            libxkbcommon-dev
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
           version: 8
+          run_install: false
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
       - name: Install just
-        run: cargo install just
+        run: cargo install just --locked
 
       - name: Setup project (install frontend deps & build FFmpeg)
         run: just setup
