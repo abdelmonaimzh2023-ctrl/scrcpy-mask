@@ -41,7 +41,12 @@ jobs:
             libudev-dev \
             libgl1-mesa-dev \
             libwayland-dev \
-            libxkbcommon-dev
+            libxkbcommon-dev \
+            libvdpau-dev \
+            libva-dev \
+            libva-x11-2 \
+            libva-drm2 \
+            libdrm-dev
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
