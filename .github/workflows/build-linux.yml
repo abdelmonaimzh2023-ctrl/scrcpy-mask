@@ -70,5 +70,13 @@ jobs:
       - name: Build frontend
         run: just web-build
 
+      - name: Load FFmpeg environment
+        run: |
+          . ./scripts/ffmpeg-env.sh
+          echo "FFMPEG_DIR=$FFMPEG_DIR"
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+
       - name: Build the application
-        run: cargo build --release
+        run: |
+          . ./scripts/ffmpeg-env.sh
+          cargo build --release
